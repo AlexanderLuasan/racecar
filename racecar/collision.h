@@ -36,11 +36,13 @@ public:
 	void makeready();
 	bool circularcolide(collisionObject * other);
 	bool colides(collisionObject * other);
+	line getline(collisionObject * other);
 	bool colidesforserch(collisionObject * other, int x, int y);
 	int top(collisionObject * other); //the number of spcae up to top colision
 	int bottom(collisionObject * other);
 	int left(collisionObject * other);
 	int right(collisionObject * other);
+	bool anglepush(int velx,int vely,int * xr,int * yr, collisionObject * other);
 	
 	/*
 	line contact(collisionObject * other);

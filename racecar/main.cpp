@@ -32,7 +32,11 @@ int main() {
 		cout << first.getwalls()[loc].getdraw()->getline(i).x2 << ",";
 		cout << first.getwalls()[loc].getdraw()->getline(i).y2 << endl;
 	}
-
+	int vx = 6;
+	int vy = -2;
+	cout << endl;
+	vectorbounce(&vx,&vy, line(0, 0, 4, 2).getslope());
+	cout << vx << "," << vy << endl;
 
 
 	system("pause");
@@ -43,7 +47,7 @@ int main() {
 	ALLEGRO_EVENT_QUEUE * queue;
 
 
-	display screen = display(800,600,1);
+	display screen = display(400,300,2);
 	
 	timmer = al_create_timer(1 / 30.0);
 	queue = al_create_event_queue();
@@ -54,8 +58,9 @@ int main() {
 	al_register_event_source(queue, al_get_timer_event_source(timmer));
 	al_register_event_source(queue, al_get_keyboard_event_source());
 
-	car player(200, 150, 40, 70,0);
-
+	car player(200, 150, 20, 35,0);
+	player.setx(first.start[0]);
+	player.sety(first.start[1]);
 
 	bool done = false;
 	while (!done) {
@@ -107,16 +112,50 @@ int main() {
 			else {
 				player.setpower(false);
 			}
-			screen.setCam(player.getx()-400,player.gety()-300);
+			screen.setCam(player.getx()-200,player.gety()-150);
+			player.rotationupdate();
+			for (int i = 0; i < first.getsize(); i++) {
+				if (first.getwalls()[i].circularcolide(player.getc())) {
+					if (first.getwalls()[i].colides(player.getc())) {
+						player.collisionrotation(&first.getwalls()[i]);
+					}
+				}
+			}
+			player.setonwall(false);
+			for (int i = 0; i < first.getsize(); i++) {
+				if (first.getwalls()[i].circularcolide(player.getf())) {
+					if (first.getwalls()[i].colides(player.getf())) {
+						player.setonwall(true);
+						break;
+					}
+				}
+			}
+
+
+
+
 			player.update();
 
+			line edge;
+			bool colide = false;
+			for (int i = 0; i < first.getsize(); i++) {
+				if (first.getwalls()[i].circularcolide(player.getc())) {
+					if (first.getwalls()[i].colides(player.getc())) {
+						colide = true;
+						edge = player.getc()->getline(&first.getwalls()[i]);
+						player.collisionmove(&first.getwalls()[i]);
+					}
+				}
+			}
+			if (colide) {
+				//player.changevelocity(edge);
+			}
 			screen.drawstart();
 
 			for (int i = 0; i < first.getsize(); i++) {
-				first.getwalls()[i];
 				screen.draw(first.getwalls()[i].getdraw());
 			}
-
+			screen.draw(player.drawingflame());
 			screen.draw(player.drawingbody());
 			screen.drawview();
 			al_flip_display();

@@ -12,7 +12,7 @@ map::map(char * name)
 
 	for (int i = 0; i < file.tagcount(); i++) {
 		tmxtag current = file.get(i);
-		if (current.head("type").compare("objectgroup")==0) {
+		if (current.head("type").compare("objectgroup")==0&& current.head("name").compare("walls")==0) {
 			for (int ii = 0; ii < current.tagcount(); ii++) {
 				if (current.get(ii).head("type").compare("object")==0) {
 					for (int iii = 0; iii < current.get(ii).tagcount(); iii++) {
@@ -22,6 +22,10 @@ map::map(char * name)
 					}
 				}
 			}
+		}
+		else if (current.head("type").compare("objectgroup") == 0 && current.head("name").compare("start") == 0) {
+			start[0] = stoi(current.get(0).head("x").c_str());
+			start[1] = stoi(current.get(0).head("y").c_str());
 		}
 	}
 	file.clear();

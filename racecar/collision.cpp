@@ -176,6 +176,19 @@ bool collisionObject::colides(collisionObject * other)
 	return false;
 }
 
+line collisionObject::getline(collisionObject * other)
+{
+	for (int i = 0; i < componentsize; i++) {
+		for (int ii = 0; ii < other->componentsize; ii++) {
+			if (this->components[i].generaloverlap(other->components[ii], other->posx - this->posx, other->posy - this->posy)) {
+				if (this->components[i].collision(other->components[ii], other->posx - this->posx, other->posy - this->posy)) {
+					return other->components[ii];
+				}
+			}
+		}
+	}
+}
+
 bool collisionObject::colidesforserch(collisionObject * other,int x,int y)
 {
 	this->setX(this->getx()+x);
@@ -273,6 +286,99 @@ int collisionObject::right(collisionObject * other)
 		}
 	}
 	return 0;
+}
+
+bool collisionObject::anglepush(int velx, int vely, int * xr, int * yr, collisionObject * other)
+{
+	*xr = 0;
+	*yr = 0;
+
+	velx = -velx;
+	vely = -vely;
+	double xstep;
+	double ystep;
+	if (vely == 0) {
+		if (velx < 0) {
+			*xr = this->right(other);
+			return true;
+		}
+		else if (velx > 0) {
+			*xr = this->left(other);
+			return true;
+		}
+	}
+
+	if (velx == 0) {
+		if (vely < 0) {
+			*yr = -this->bottom(other);
+			return true;
+		}
+		else if (vely > 0) {
+			*yr = -this->top(other);
+			return true;
+		}
+	}
+
+
+	if (abs(velx) > abs(vely)) {
+		ystep = double(vely) / abs(velx);
+		if (velx > 0) {
+			xstep = 1;
+		}
+		else {
+			xstep = -1;
+		}
+	}
+	else{
+		xstep = double(velx) / abs(vely);
+		if (vely > 0) {
+			ystep = 1;
+		}
+		else {
+			ystep = -1;
+		}
+	}
+
+
+
+	int min = 0;
+	int max = serchdistance;
+	if (this->colidesforserch(other, xstep*(max) / 2, ystep*(max) / 2)) {
+		return false;
+	}
+	while (true) {
+		if (max == min + 1) {
+
+			*xr = (xstep * (max + 1)) + .5;
+			*yr = (ystep * (max + 1)) + .5;
+			if (xstep < 0) {
+				*xr -= 2;
+			}
+			else {
+				*xr += 2;
+			}
+
+			if (ystep < 0) {
+				*yr -= 2;
+			}
+			else {
+				*yr += 2;
+			}
+
+
+			return true;
+		}
+		if (this->colidesforserch(other, xstep*(max + min) / 2, ystep*(max + min) / 2)) {
+			min = (max + min) / 2;
+		}
+		else {
+			max = (max + min) / 2;
+		}
+	}
+
+
+
+	return false;
 }
 
 double distance(int x1, int y1, int x2, int y2)

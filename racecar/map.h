@@ -14,9 +14,12 @@ public:
 	bool addshape(tmxtag c, string x, string y);
 	collisionObject * getwalls();
 	int getsize();
-
+	int start[2];
 private:
 	collisionObject * walls;
 	int size;
 	int maxsize;
+
+
+	
 };
